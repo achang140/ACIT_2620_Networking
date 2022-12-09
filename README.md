@@ -1,9 +1,11 @@
 # Network Configuration Exercise 
 
 ---
-### Other Commands 
+### Notes  
 
 ```Shell 
+# Networking Tool: https://jodies.de/ipcalc
+
 # Use PowerShell for VMs (Easier to Copy and Paste Script or Commands)
 `ssh VM_NAME` 
 
@@ -13,7 +15,6 @@
 # Stop Firewall 
 `sudo stop nftables.service`
 
-# Other Notes: 
 # You should be able to ping to web and ws1 from ws2 and ws3. 
 ```
 ![Diagram](./images/diagram.png)
@@ -33,6 +34,8 @@ The configuration should contain a fixed address assignment for either **test1**
 
 * Your *dynamic routing configuration (bird)* in **r1** should advertise this new network so that it is discoverable and accessible from anywhere in the surrounding topology. <br/>
 That is, you should be able to send traffic from nodes in the new network to nodes in other networks in the project topology. 
+
+![Activity 1](./images/FirstAct.png)
 
 ---
 
@@ -197,6 +200,8 @@ This VM should be connected to the same *host-only network* as **r1** and **r2**
 This configuration should contain *fixed address* assignments for both **test3** and **test4**. 
 
 * Create a *dynamic routing configuration* in **grp1_rtr** such that the new **grp1_128** network is discoverable and accessible from the rest of your project topology. 
+
+![Activity 2](./images/SecondAct.png)
 
 --- 
 
