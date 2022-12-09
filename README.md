@@ -61,12 +61,12 @@ That is, you should be able to send traffic from nodes in the new network to nod
 5. Select **Link Clone** 
 6. Select **Clone** 
 
-#### Step 3. Set Up Network in VMs 
+#### Step 3. Set Up Network in test1 & test2 
 1. Right-click on **test1** or **test2** -> select **Settings** 
 2. Select **Enable Network Adapter** 
 * Attached to: **Internal Network** 
 * Name: **grp5_128**
-* MAC Address: (r1) **02.00.00.00.00.10** (r2) **02.00.00.00.00.11**
+* MAC Address: (test1) **02.00.00.00.00.10** (test2) **02.00.00.00.00.11**
 3. Press "OK" 
 
 ### From now on, everything will be done in r1. 
@@ -249,7 +249,7 @@ Note: Do NOT Change Advanced Settings - Remain DENY for Promiscous Mode.
 * Attached to: **Internal Network** 
 * Name: **grp1_128**
 * Adapter Type: **Paravirtualized Network (virtio-net)** 
-* MAC Address: 
+* MAC Address: (test3) **02.00.00.00.00.12** (test4) **02.00.00.00.00.13**
 2. Press "OK" 
 
 #### Step 3. Router grp1_rtr 
