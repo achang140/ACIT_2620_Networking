@@ -124,14 +124,14 @@ host test1 {
     # MAC Address 
     hardware ethernet 02.00.00.00.00.10; 
     # Fixed Address NOT within range assigned in subnet with netmask 
-    fixed-address 10.0.46.151
+    fixed-address 10.0.46.151;
 }
 
 host test2 {
     # MAC Address 
     hardware ethernet 02.00.00.00.00.11; 
     # Fixed Address NOT within range assigned in subnet with netmask 
-    fixed-address 10.0.46.152
+    fixed-address 10.0.46.152;
 }
 ```
 
@@ -250,4 +250,127 @@ Note: Do NOT Change Advanced Settings - Remain DENY for Promiscous Mode.
 #### Step 3. Router grp1_rtr 
 1. `nmtui` 
 2. Edit **System enp0s3** to an IP address that is NOT being used (Ex: 10.20.30.10/24) <br/>
+3. Edit **Wire Connection** to an IP address within the usable range of the given IP address (HostMax recommended: 10.0.45.190)
 
+### Windows PowerShell 
+* `ssh admin@10.20.30.10`
+
+#### Step 4. dhcpd.conf - New Subnet with Netmask 
+1. `sudo vim /etc/dhcp/dhcpd.conf` 
+2. Create a new Subnet with Netmask 
+
+```Shell 
+# DHCP Server Configuration file.
+#   see /usr/share/doc/dhcp-server/dhcpd.conf.example
+#   see dhcpd.conf(5) man page
+# Global options
+
+option domain-name "2620.acit";
+option domain-name-servers 8.8.8.8,10.20.30.254;
+
+subnet 10.0.100.0 netmask 255.255.255.0 {
+        option routers 10.0.100.254;
+        range 10.0.100.100 10.0.100.200;
+}
+
+host web {
+        hardware ethernet 02:00:00:00:00:03;
+        fixed-address 10.0.100.1;
+}
+
+host ws1 {
+        hardware ethernet 02:00:00:00:00:04;
+        fixed-address 10.0.100.2;
+}
+
+# New Subnet with Netmask Below: 
+
+# subnet GIVEN_IP netmask NETMASK_IP (Tool: https://jodies.de/ipcalc)
+subnet 10.0.45.128 netmask 255.255.255.192 {
+        # option routers HOSTMAX_IP (IP Address used by grp1_rtr)
+        option routers 10.0.45.190;
+        # Range should be within Usable IP range, and Fixed Addresses canNOT be included in this range. 
+        range 10.0.45.129 10.0.45.150;
+}
+
+host test3 {
+    # MAC Address 
+    hardware ethernet 02.00.00.00.00.12; 
+    # Fixed Address NOT within range assigned in subnet with netmask 
+    fixed-address 10.0.46.151;
+}
+
+host test4 {
+    # MAC Address 
+    hardware ethernet 02.00.00.00.00.13; 
+    # Fixed Address NOT within range assigned in subnet with netmask 
+    fixed-address 10.0.46.152;
+}
+```
+
+3. `sudo dhcpd -t` to check configuration syntax 
+* Correct: "Source compiled to use binary-leases" 
+4. `sudo systemctl enable dhcpd` -> `sudo systemctl start dhcpd` 
+
+* Now **test3** and **test4** should have proper IP address
+* Start **test3** and **test4** in **Oracle VM** 
+
+#### Step 5. Router - sysctl.conf 
+1. `sudo vim /etc/sysctl.conf` 
+2. Add the following to the end of the file: 
+```Shell
+net.ipv4.ip_forward = 1 
+```
+3. Run `sudo sysctl --system` to enable IP forwarding 
+
+#### Step 6. bird.conf - New Interface   
+Secure copy of bird.conf from r1 
+* `sudo scp admin@10.20.30.100:/etc/bird.conf /etc/bird.conf`<br/>
+-> "yes" -> enter password 
+
+1. `sudo vim /etc/bird.conf` 
+2. Change **router id** to **enp0s3 Interface IP**
+
+```Shell 
+log syslog all;
+
+router id 10.20.30.10; # Use enp0s3 Interface IP as the router id 
+
+protocol device {
+
+}
+
+protocol kernel {
+        ipv4 {
+                export all;
+        };
+}
+
+# Protocol ospf allows routers to communicate 
+protocol ospf {
+        area 0 {
+                interface "enp0s3" {
+                };
+                # Interface enp0s8 NOT participate in communication with other routers, indicates by "stub" 
+                interface "enp0s8" {
+                        stub;
+                };
+        };
+}
+```
+3. `sudo bird -p` to check configuration syntax 
+* Correct: Nothing will show 
+4. `sudo systemctl enable bird` -> `sudo systemctl start bird`
+
+---
+
+Other Helpful Commands: 
+* `ip a` checks IP Addresses 
+* `ip route` checks Routing Table, may tkae a couple times to have a complete list 
+* `ping 10.0.100.1` ping web 
+* `ping 10.0.100.2` ping ws1 
+
+* `ping 10.0.200.1` should NOT be able to ping ws2, due to it is a private network 
+* `ssh admin@10.20.30.200 -p 52022` admin log in with IP address of R2 and Port Number will be able to ping ws2 
+
+* Assign `stub` to an interface that does not involve in communication with other routers  
