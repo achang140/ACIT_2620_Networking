@@ -125,14 +125,14 @@ subnet 10.0.46.128 netmask 255.255.255.192 {
 
 host test1 {
     # MAC Address 
-    hardware ethernet 02.00.00.00.00.10; 
+    hardware ethernet 02:00:00:00:00:10; 
     # Fixed Address NOT within range assigned in subnet with netmask 
     fixed-address 10.0.46.151;
 }
 
 host test2 {
     # MAC Address 
-    hardware ethernet 02.00.00.00.00.11; 
+    hardware ethernet 02:00:00:00:00:11; 
     # Fixed Address NOT within range assigned in subnet with netmask 
     fixed-address 10.0.46.152;
 }
@@ -300,14 +300,14 @@ subnet 10.0.45.128 netmask 255.255.255.192 {
 
 host test3 {
     # MAC Address 
-    hardware ethernet 02.00.00.00.00.12; 
+    hardware ethernet 02:00:00:00:00:12; 
     # Fixed Address NOT within range assigned in subnet with netmask 
     fixed-address 10.0.46.151;
 }
 
 host test4 {
     # MAC Address 
-    hardware ethernet 02.00.00.00.00.13; 
+    hardware ethernet 02:00:00:00:00:13; 
     # Fixed Address NOT within range assigned in subnet with netmask 
     fixed-address 10.0.46.152;
 }
